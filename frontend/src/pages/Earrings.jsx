@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ProductList from '../components/ProductList';
+import { API_ENDPOINTS } from '../config/api';
 
 function Earrings() {
   const [earrings, setEarrings] = useState([]);
@@ -12,13 +13,11 @@ function Earrings() {
 
   const fetchEarrings = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/products');
+      const response = await fetch(`${API_ENDPOINTS.products}?category=earrings`);
       const data = await response.json();
       
       if (data.success) {
-        // Filter only earrings from the products
-        const earringsOnly = data.products.filter(product => product.category === 'earrings');
-        setEarrings(earringsOnly);
+        setEarrings(data.products);
       } else {
         setError('Failed to load earrings');
       }
