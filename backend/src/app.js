@@ -24,7 +24,14 @@ const PORT = process.env.PORT || 5001;
 // Enhanced CORS configuration for security
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://alankree-freexrbwc-ananyas-projects-00b32e57.vercel.app'] // Your actual Vercel domain
+    ? function (origin, callback) {
+        // Allow requests from any Vercel deployment under your account
+        if (!origin || origin.includes('ananyas-projects-00b32e57.vercel.app')) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      }
     : ['http://localhost:3000', 'http://localhost:3001'], // Allow both dev ports
   credentials: true,
   optionsSuccessStatus: 200,
