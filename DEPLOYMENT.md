@@ -89,9 +89,9 @@ origin: process.env.NODE_ENV === 'production'
 - **Total Cost**: $0/month
 
 ### Your Live URLs:
-- Frontend: `https://your-app.vercel.app`
-- Backend: `https://your-app.railway.app`
-- Admin Panel: `https://your-app.vercel.app/admin`
+- Frontend: `https://alankree-freexrbwc-ananyas-projects-00b32e57.vercel.app`
+- Backend: `https://alankree-production.up.railway.app`
+- Admin Panel: `https://alankree-freexrbwc-ananyas-projects-00b32e57.vercel.app/admin`
 
 ### Default Admin Login:
 - Email: admin@alankree.com

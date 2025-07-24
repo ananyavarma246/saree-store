@@ -24,7 +24,7 @@ const PORT = process.env.PORT || 5001;
 // Enhanced CORS configuration for security
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-frontend-domain.vercel.app'] // Replace with your Vercel domain
+    ? ['https://alankree-freexrbwc-ananyas-projects-00b32e57.vercel.app'] // Your actual Vercel domain
     : ['http://localhost:3000', 'http://localhost:3001'], // Allow both dev ports
   credentials: true,
   optionsSuccessStatus: 200,
