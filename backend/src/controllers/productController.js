@@ -3,7 +3,15 @@ const Product = require('../models/product');
 // Get all products
 exports.getProducts = async (req, res) => {
     try {
-        const products = await Product.find();
+        const { category } = req.query;
+        let query = {};
+        
+        // Filter by category if provided
+        if (category) {
+            query.category = category;
+        }
+        
+        const products = await Product.find(query);
         res.json({
             success: true,
             products: products
