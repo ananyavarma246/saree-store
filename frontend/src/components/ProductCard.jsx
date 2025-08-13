@@ -107,6 +107,11 @@ function ProductCard({ product, onAddToCart }) {
             className="card-img-top" 
             alt={product.name}
             style={{ height: '250px', objectFit: 'cover' }}
+            onError={(e) => {
+              console.log('Image failed to load:', product.image);
+              e.target.src = 'https://via.placeholder.com/400x250/CCCCCC/666666?text=Image+Not+Found';
+            }}
+            onLoad={() => console.log('Image loaded successfully:', product.image)}
           />
           
           {/* Overlay buttons */}
