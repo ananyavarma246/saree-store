@@ -13,8 +13,8 @@ function Sarees() {
 
   const fetchSarees = async () => {
     try {
-      console.log('🔄 Fetching sarees from:', `${API_ENDPOINTS.products}?category=saree`);
-      const response = await fetch(`${API_ENDPOINTS.products}?category=saree`);
+      console.log('🔄 Fetching sarees from:', `${API_ENDPOINTS.products}?category=sarees`);
+      const response = await fetch(`${API_ENDPOINTS.products}?category=sarees`);
       console.log('📡 Response status:', response.status);
       
       const data = await response.json();

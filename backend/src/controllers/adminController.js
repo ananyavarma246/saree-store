@@ -7,6 +7,31 @@ const { verifyAdminCredentials } = require('../middleware/adminAuth');
 // Import temporary orders from orderController
 const { getTemporaryOrders } = require('./orderController');
 
+// Debug endpoint to check environment variables (remove in production)
+exports.debugEnvironment = async (req, res) => {
+    try {
+        const envInfo = {
+            hasAdminEmail: !!process.env.ADMIN_EMAIL,
+            hasAdminPasswordHash: !!process.env.ADMIN_PASSWORD_HASH,
+            hasAdminJwtSecret: !!process.env.ADMIN_JWT_SECRET,
+            adminEmailValue: process.env.ADMIN_EMAIL || 'NOT_SET',
+            nodeEnv: process.env.NODE_ENV || 'NOT_SET',
+            timestamp: new Date().toISOString()
+        };
+        
+        res.json({
+            success: true,
+            environment: envInfo,
+            message: 'Environment debug info - remove this endpoint in production!'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Debug error: ' + error.message
+        });
+    }
+};
+
 // Secure Admin Login with JWT
 exports.adminLogin = async (req, res) => {
     try {

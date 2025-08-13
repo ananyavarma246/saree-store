@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 // Admin credentials from environment variables
 const ADMIN_CREDENTIALS = {
     email: process.env.ADMIN_EMAIL || 'admin@alankree.com',
-    password: process.env.ADMIN_PASSWORD_HASH || '$2b$10$z/Oh9ClDGE9Xbr44XbWijOQlC4rIOEchqKV4fZt8hsVOxny0i1CqO' // "admin123"
+    password: process.env.ADMIN_PASSWORD_HASH || '$2b$12$FMu3EgqLiSvpkWvNV8ZeMO7bWV8OgqnI/gnkez7PrSul2tDuzDTDW' // "admin123" - corrected hash
 };
 
 // Middleware to verify admin JWT token

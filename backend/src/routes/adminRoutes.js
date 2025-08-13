@@ -6,6 +6,7 @@ const { verifyAdminToken, adminRateLimiter } = require('../middleware/adminAuth'
 const { cleanupDummyData } = require('../controllers/cleanupController');
 const {
     adminLogin,
+    debugEnvironment,
     getDashboardStats,
     getAllOrders,
     updateOrderStatus,
@@ -18,6 +19,9 @@ const {
 
 // Admin Authentication (public route with rate limiting)
 router.post('/login', adminRateLimiter, adminLogin);
+
+// Debug route to check environment variables (remove in production)
+router.get('/debug-env', debugEnvironment);
 
 // Protected Admin Routes - All require valid admin JWT token
 // Dashboard Stats
