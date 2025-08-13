@@ -13,16 +13,22 @@ function Earrings() {
 
   const fetchEarrings = async () => {
     try {
+      console.log('🔄 Fetching earrings from:', `${API_ENDPOINTS.products}?category=earrings`);
       const response = await fetch(`${API_ENDPOINTS.products}?category=earrings`);
+      console.log('📡 Response status:', response.status);
+      
       const data = await response.json();
+      console.log('📦 API Response:', data);
       
       if (data.success) {
+        console.log('✅ Earrings loaded:', data.products.length);
         setEarrings(data.products);
       } else {
+        console.error('❌ API returned error:', data);
         setError('Failed to load earrings');
       }
     } catch (error) {
-      console.error('Error fetching earrings:', error);
+      console.error('💥 Error fetching earrings:', error);
       setError('Failed to load earrings');
     } finally {
       setLoading(false);

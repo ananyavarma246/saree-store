@@ -13,16 +13,22 @@ function Sarees() {
 
   const fetchSarees = async () => {
     try {
+      console.log('🔄 Fetching sarees from:', `${API_ENDPOINTS.products}?category=saree`);
       const response = await fetch(`${API_ENDPOINTS.products}?category=saree`);
+      console.log('📡 Response status:', response.status);
+      
       const data = await response.json();
+      console.log('📦 API Response:', data);
       
       if (data.success) {
+        console.log('✅ Sarees loaded:', data.products.length);
         setSarees(data.products);
       } else {
+        console.error('❌ API returned error:', data);
         setError('Failed to load sarees');
       }
     } catch (error) {
-      console.error('Error fetching sarees:', error);
+      console.error('💥 Error fetching sarees:', error);
       setError('Failed to load sarees');
     } finally {
       setLoading(false);

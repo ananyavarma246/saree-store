@@ -1,6 +1,11 @@
 // API Configuration
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
+// Debug logging
+console.log('🔧 API Configuration:');
+console.log('- REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+console.log('- API_BASE_URL:', API_BASE_URL);
+
 export const API_ENDPOINTS = {
   base: API_BASE_URL,
   products: `${API_BASE_URL}/api/products`,
