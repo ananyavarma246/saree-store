@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const upload = require('../middleware/upload');
+const { upload: cloudinaryUpload } = require('../middleware/cloudinary-upload');
 const { verifyAdminToken, adminRateLimiter } = require('../middleware/adminAuth');
 const { cleanupDummyData } = require('../controllers/cleanupController');
 const {
@@ -28,8 +29,8 @@ router.put('/orders/:orderId/status', verifyAdminToken, updateOrderStatus);
 
 // Product Management Routes
 router.get('/products', verifyAdminToken, getAllProducts);
-router.post('/products', verifyAdminToken, upload.single('image'), addProduct);
-router.put('/products/:productId', verifyAdminToken, upload.single('image'), updateProduct);
+router.post('/products', verifyAdminToken, cloudinaryUpload.single('image'), addProduct);
+router.put('/products/:productId', verifyAdminToken, cloudinaryUpload.single('image'), updateProduct);
 router.delete('/products/:productId', verifyAdminToken, deleteProduct);
 
 // User Management Routes

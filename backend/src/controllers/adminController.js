@@ -928,12 +928,16 @@ exports.addProduct = async (req, res) => {
     try {
         let productData = { ...req.body };
         
-        // If image file was uploaded, use the uploaded file path
+        // If image file was uploaded, use Cloudinary URL or fallback to local
         if (req.file) {
-            const baseUrl = process.env.NODE_ENV === 'production' 
-                ? 'https://alankree-production.up.railway.app'
-                : 'http://localhost:5001';
-            productData.image = `${baseUrl}/uploads/${req.file.filename}`;
+            // Cloudinary provides the secure URL directly
+            productData.image = req.file.path || req.file.secure_url || (() => {
+                // Fallback for local upload
+                const baseUrl = process.env.NODE_ENV === 'production' 
+                    ? 'https://alankree-production.up.railway.app'
+                    : 'http://localhost:5001';
+                return `${baseUrl}/uploads/${req.file.filename}`;
+            })();
         }
         
         const product = await Product.create(productData);
@@ -957,12 +961,16 @@ exports.updateProduct = async (req, res) => {
         const { productId } = req.params;
         let updateData = { ...req.body };
         
-        // If image file was uploaded, use the uploaded file path
+        // If image file was uploaded, use Cloudinary URL or fallback to local
         if (req.file) {
-            const baseUrl = process.env.NODE_ENV === 'production' 
-                ? 'https://alankree-production.up.railway.app'
-                : 'http://localhost:5001';
-            updateData.image = `${baseUrl}/uploads/${req.file.filename}`;
+            // Cloudinary provides the secure URL directly
+            updateData.image = req.file.path || req.file.secure_url || (() => {
+                // Fallback for local upload
+                const baseUrl = process.env.NODE_ENV === 'production' 
+                    ? 'https://alankree-production.up.railway.app'
+                    : 'http://localhost:5001';
+                return `${baseUrl}/uploads/${req.file.filename}`;
+            })();
         }
         
         const product = await Product.findByIdAndUpdate(
