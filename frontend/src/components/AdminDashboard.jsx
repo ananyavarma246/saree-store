@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+import { Bar, Pie } from 'react-chartjs-2';
+import { API_ENDPOINTS } from '../config/api';
 import adminAPI from '../utils/adminAPI';
 
-const AdminDashboard = ({ onSectionChange }) => {
+const AdminDashboard = () => {
   const [dashboardStats, setDashboardStats] = useState({
     totalOrders: 0,
     totalProducts: 0,
@@ -27,7 +30,7 @@ const AdminDashboard = ({ onSectionChange }) => {
         
         // Try to get fresh admin token automatically
         try {
-          const response = await fetch('http://localhost:5001/api/admin/login', {
+          const response = await fetch(API_ENDPOINTS.admin.login, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -108,7 +111,7 @@ const AdminDashboard = ({ onSectionChange }) => {
               onClick={async () => {
                 try {
                   // Get fresh admin token by logging in
-                  const response = await fetch('http://localhost:5001/api/admin/login', {
+                  const response = await fetch(API_ENDPOINTS.admin.login, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

@@ -33,8 +33,12 @@ router.put('/orders/:orderId/status', verifyAdminToken, updateOrderStatus);
 
 // Product Management Routes
 router.get('/products', verifyAdminToken, getAllProducts);
-router.post('/products', verifyAdminToken, cloudinaryUpload.single('image'), addProduct);
-router.put('/products/:productId', verifyAdminToken, cloudinaryUpload.single('image'), updateProduct);
+router.post('/products', verifyAdminToken, (req, res, next) => {
+    console.log('🔄 POST /products route called');
+    console.log('Content-Type:', req.headers['content-type']);
+    next();
+}, cloudinaryUpload, addProduct);
+router.put('/products/:productId', verifyAdminToken, cloudinaryUpload, updateProduct);
 router.delete('/products/:productId', verifyAdminToken, deleteProduct);
 
 // User Management Routes

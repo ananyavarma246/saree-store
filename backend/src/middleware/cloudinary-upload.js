@@ -2,12 +2,26 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
 
-// Configure cloudinary
+// Configure cloudinary with error handling
+console.log('🔧 Configuring Cloudinary...');
+console.log('Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME ? 'SET' : 'NOT SET');
+console.log('API Key:', process.env.CLOUDINARY_API_KEY ? 'SET' : 'NOT SET');  
+console.log('API Secret:', process.env.CLOUDINARY_API_SECRET ? 'SET' : 'NOT SET');
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+// Test Cloudinary connection
+cloudinary.api.ping()
+  .then(result => {
+    console.log('✅ Cloudinary connection successful:', result);
+  })
+  .catch(error => {
+    console.log('❌ Cloudinary connection failed:', error.message);
+  });
 
 // Configure cloudinary storage
 const storage = new CloudinaryStorage({
@@ -39,6 +53,41 @@ const upload = multer({
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB limit
   }
-});
+}).single('image');
 
-module.exports = { upload, cloudinary };
+// Wrap upload with error handling
+const uploadWithErrorHandling = (req, res, next) => {
+  console.log('🔄 Starting file upload...');
+  
+  upload(req, res, (err) => {
+    if (err) {
+      console.log('❌ Upload error:', err.message);
+      console.log('Error type:', err.constructor.name);
+      
+      // If Cloudinary fails, log the error but continue
+      if (err.message.includes('cloudinary') || err.message.includes('Cloudinary')) {
+        console.log('⚠️ Cloudinary upload failed, continuing without file...');
+        req.uploadError = err.message;
+        return next();
+      }
+      
+      return res.status(400).json({
+        success: false,
+        error: 'File upload failed: ' + err.message
+      });
+    }
+    
+    if (req.file) {
+      console.log('✅ File uploaded successfully:');
+      console.log('   Original name:', req.file.originalname);
+      console.log('   File path:', req.file.path);
+      console.log('   Secure URL:', req.file.secure_url);
+    } else {
+      console.log('⚠️ No file in request');
+    }
+    
+    next();
+  });
+};
+
+module.exports = { upload: uploadWithErrorHandling, cloudinary };

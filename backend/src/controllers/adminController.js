@@ -10,6 +10,8 @@ const { getTemporaryOrders } = require('./orderController');
 // Debug endpoint to check environment variables (remove in production)
 exports.debugEnvironment = async (req, res) => {
     try {
+        console.log('🔍 Debug endpoint called');
+        
         const envInfo = {
             hasAdminEmail: !!process.env.ADMIN_EMAIL,
             hasAdminPasswordHash: !!process.env.ADMIN_PASSWORD_HASH,
@@ -23,12 +25,24 @@ exports.debugEnvironment = async (req, res) => {
             timestamp: new Date().toISOString()
         };
         
+        // Test Cloudinary connection
+        try {
+            const { cloudinary } = require('../middleware/cloudinary-upload');
+            const pingResult = await cloudinary.api.ping();
+            envInfo.cloudinaryConnection = 'SUCCESS';
+            envInfo.cloudinaryPing = pingResult;
+        } catch (cloudinaryError) {
+            envInfo.cloudinaryConnection = 'FAILED';
+            envInfo.cloudinaryError = cloudinaryError.message;
+        }
+        
         res.json({
             success: true,
             environment: envInfo,
             message: 'Environment debug info - remove this endpoint in production!'
         });
     } catch (error) {
+        console.error('❌ Debug endpoint error:', error);
         res.status(500).json({
             success: false,
             message: 'Debug error: ' + error.message

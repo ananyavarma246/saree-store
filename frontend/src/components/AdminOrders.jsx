@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import adminAPI from '../utils/adminAPI';
+import { API_ENDPOINTS } from '../config/api';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -21,7 +22,7 @@ const AdminOrders = () => {
         
         // Try auto-login
         try {
-          const response = await fetch('http://localhost:5001/api/admin/login', {
+          const response = await fetch(API_ENDPOINTS.admin.login, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -71,7 +72,7 @@ const AdminOrders = () => {
         
         // Try auto-login
         try {
-          const response = await fetch('http://localhost:5001/api/admin/login', {
+          const response = await fetch(API_ENDPOINTS.admin.login, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
