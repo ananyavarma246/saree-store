@@ -930,7 +930,10 @@ exports.addProduct = async (req, res) => {
         
         // If image file was uploaded, use the uploaded file path
         if (req.file) {
-            productData.image = `http://localhost:5001/uploads/${req.file.filename}`;
+            const baseUrl = process.env.NODE_ENV === 'production' 
+                ? 'https://alankree-production.up.railway.app'
+                : 'http://localhost:5001';
+            productData.image = `${baseUrl}/uploads/${req.file.filename}`;
         }
         
         const product = await Product.create(productData);
@@ -956,7 +959,10 @@ exports.updateProduct = async (req, res) => {
         
         // If image file was uploaded, use the uploaded file path
         if (req.file) {
-            updateData.image = `http://localhost:5001/uploads/${req.file.filename}`;
+            const baseUrl = process.env.NODE_ENV === 'production' 
+                ? 'https://alankree-production.up.railway.app'
+                : 'http://localhost:5001';
+            updateData.image = `${baseUrl}/uploads/${req.file.filename}`;
         }
         
         const product = await Product.findByIdAndUpdate(

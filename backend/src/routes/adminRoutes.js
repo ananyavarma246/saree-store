@@ -50,7 +50,11 @@ router.post('/upload-image', verifyAdminToken, upload.single('image'), (req, res
             });
         }
 
-        const imageUrl = `http://localhost:5001/uploads/${req.file.filename}`;
+        // Use production URL or fallback to localhost for development
+        const baseUrl = process.env.NODE_ENV === 'production' 
+            ? 'https://alankree-production.up.railway.app'
+            : 'http://localhost:5001';
+        const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
         
         res.status(200).json({
             success: true,
