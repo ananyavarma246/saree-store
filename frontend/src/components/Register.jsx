@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_ENDPOINTS } from '../config/api';
 
 const Register = ({ onClose, onSwitchToLogin }) => {
   const [formData, setFormData] = useState({
@@ -77,7 +78,7 @@ const Register = ({ onClose, onSwitchToLogin }) => {
     
     try {
       // Call the actual registration API
-      const response = await fetch('http://localhost:5001/api/users/register', {
+      const response = await fetch(API_ENDPOINTS.auth.register, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

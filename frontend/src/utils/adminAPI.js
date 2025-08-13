@@ -1,7 +1,9 @@
 // Secure API utility for admin requests
+import { API_ENDPOINTS } from '../config/api';
+
 class AdminAPI {
     constructor() {
-        this.baseURL = 'http://localhost:5001/api/admin';
+        this.baseURL = API_ENDPOINTS.base + '/api/admin';
     }
 
     // Get admin token from localStorage

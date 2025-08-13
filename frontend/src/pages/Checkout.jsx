@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from '../config/api';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -124,7 +125,7 @@ const Checkout = () => {
 
       console.log('Sending order:', orderPayload); // Debug log
 
-      const response = await fetch('http://localhost:5001/api/orders/create', {
+      const response = await fetch(API_ENDPOINTS.orders.create, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

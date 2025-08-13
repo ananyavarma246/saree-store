@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://alankree-production.up.railway.app';
 
 // Debug logging
 console.log('🔧 API Configuration:');

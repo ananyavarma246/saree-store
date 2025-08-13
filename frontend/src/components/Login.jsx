@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_ENDPOINTS } from '../config/api';
 
 const Login = ({ onClose, onSwitchToRegister }) => {
   const [formData, setFormData] = useState({
@@ -51,10 +52,12 @@ const Login = ({ onClose, onSwitchToRegister }) => {
       // Check if this is admin login
       const isAdminLogin = formData.email === 'admin@alankree.com';
       
-      // Choose the appropriate endpoint
+      // Choose the appropriate endpoint using API config
       const endpoint = isAdminLogin ? 
-        'http://localhost:5001/api/admin/login' : 
-        'http://localhost:5001/api/users/login';
+        API_ENDPOINTS.admin.login : 
+        API_ENDPOINTS.auth.login;
+      
+      console.log('🔐 Login attempt:', { isAdmin: isAdminLogin, endpoint });
       
       // Call the backend API
       const response = await fetch(endpoint, {

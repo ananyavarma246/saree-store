@@ -41,28 +41,60 @@ app.use((req, res, next) => {
     next();
 });
 
-// Enhanced CORS configuration for security
+// Enhanced CORS configuration for security - More permissive for debugging
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? function (origin, callback) {
-        // Allow requests from any Vercel deployment under your account
-        if (!origin || origin.includes('ananyas-projects-00b32e57.vercel.app')) {
-          callback(null, true);
-        } else {
-          callback(new Error('Not allowed by CORS'));
-        }
-      }
-    : ['http://localhost:3000', 'http://localhost:3001'], // Allow both dev ports
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow all Vercel deployments and localhost
+    if (
+      origin.includes('ananyas-projects-00b32e57.vercel.app') ||
+      origin.includes('localhost') ||
+      origin.includes('127.0.0.1') ||
+      origin.includes('vercel.app')
+    ) {
+      callback(null, true);
+    } else {
+      console.log('🚫 CORS blocked origin:', origin);
+      callback(null, true); // Allow all origins temporarily for debugging
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+  allowedHeaders: [
+    'Content-Type', 
+    'Authorization', 
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Cache-Control',
+    'X-File-Name'
+  ],
+  exposedHeaders: ['Content-Length', 'X-Requested-With']
 };
 
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' })); // Limit JSON payload size
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Explicit preflight handler for all requests
+app.options('*', (req, res) => {
+  console.log('🔄 Preflight request for:', req.path);
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS,PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control, X-File-Name');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.sendStatus(200);
+});
+
+// Request logging for debugging
+app.use((req, res, next) => {
+  console.log(`📡 ${req.method} ${req.path} from ${req.headers.origin || 'unknown'}`);
+  next();
+});
 
 // Security headers
 app.use((req, res, next) => {
