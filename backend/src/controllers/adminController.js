@@ -979,22 +979,29 @@ exports.addProduct = async (req, res) => {
         
         let productData = { ...req.body };
         
-        // Handle image upload - prioritize Cloudinary, fallback to Railway storage
+        // Handle image upload - ONLY accept Cloudinary URLs
         if (req.file) {
             if (req.file.path && req.file.path.includes('cloudinary.com')) {
                 // Cloudinary upload successful
                 productData.image = req.file.path;
                 console.log('✅ Using Cloudinary URL:', req.file.path);
-            } else if (req.file.secure_url) {
+            } else if (req.file.secure_url && req.file.secure_url.includes('cloudinary.com')) {
                 // Alternative Cloudinary URL format
                 productData.image = req.file.secure_url;
                 console.log('✅ Using Cloudinary secure URL:', req.file.secure_url);
-            } else if (req.file.filename) {
-                // Fallback to Railway storage
-                const baseUrl = 'https://alankree-production.up.railway.app';
-                productData.image = `${baseUrl}/uploads/${req.file.filename}`;
-                console.log('⚠️ Using Railway storage (ephemeral):', productData.image);
+            } else {
+                // No valid Cloudinary URL - reject the upload
+                console.log('❌ Invalid image upload - no Cloudinary URL found');
+                console.log('File path:', req.file.path);
+                console.log('Secure URL:', req.file.secure_url);
+                return res.status(400).json({
+                    success: false,
+                    error: 'Image upload failed - invalid storage service. Please try uploading again.'
+                });
             }
+        } else {
+            // No image uploaded - this might be okay for some products
+            console.log('⚠️ No image uploaded with product');
         }
         
         // Ensure numeric fields are properly converted
@@ -1029,21 +1036,25 @@ exports.updateProduct = async (req, res) => {
         
         let updateData = { ...req.body };
         
-        // Handle image upload - prioritize Cloudinary, fallback to Railway storage
+        // Handle image upload - ONLY accept Cloudinary URLs
         if (req.file) {
             if (req.file.path && req.file.path.includes('cloudinary.com')) {
                 // Cloudinary upload successful
                 updateData.image = req.file.path;
                 console.log('✅ Using Cloudinary URL:', req.file.path);
-            } else if (req.file.secure_url) {
+            } else if (req.file.secure_url && req.file.secure_url.includes('cloudinary.com')) {
                 // Alternative Cloudinary URL format
                 updateData.image = req.file.secure_url;
                 console.log('✅ Using Cloudinary secure URL:', req.file.secure_url);
-            } else if (req.file.filename) {
-                // Fallback to Railway storage
-                const baseUrl = 'https://alankree-production.up.railway.app';
-                updateData.image = `${baseUrl}/uploads/${req.file.filename}`;
-                console.log('⚠️ Using Railway storage (ephemeral):', updateData.image);
+            } else {
+                // No valid Cloudinary URL - reject the upload
+                console.log('❌ Invalid image upload - no Cloudinary URL found');
+                console.log('File path:', req.file.path);
+                console.log('Secure URL:', req.file.secure_url);
+                return res.status(400).json({
+                    success: false,
+                    error: 'Image upload failed - invalid storage service. Please try uploading again.'
+                });
             }
         }
         

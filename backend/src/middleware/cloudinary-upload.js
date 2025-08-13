@@ -57,31 +57,47 @@ const upload = multer({
 
 // Wrap upload with error handling
 const uploadWithErrorHandling = (req, res, next) => {
-  console.log('🔄 Starting file upload...');
+  console.log('🔄 Starting Cloudinary file upload...');
+  console.log('Cloudinary Config Check:');
+  console.log('- Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME ? 'SET' : 'NOT SET');
+  console.log('- API Key:', process.env.CLOUDINARY_API_KEY ? 'SET' : 'NOT SET');  
+  console.log('- API Secret:', process.env.CLOUDINARY_API_SECRET ? 'SET' : 'NOT SET');
+  
+  // Check if Cloudinary is properly configured before attempting upload
+  if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    console.log('❌ Cloudinary not properly configured - missing environment variables');
+    return res.status(500).json({
+      success: false,
+      error: 'Image upload service not configured. Please contact administrator.'
+    });
+  }
   
   upload(req, res, (err) => {
     if (err) {
-      console.log('❌ Upload error:', err.message);
+      console.log('❌ Cloudinary upload error:', err.message);
       console.log('Error type:', err.constructor.name);
       
-      // If Cloudinary fails, log the error but continue
-      if (err.message.includes('cloudinary') || err.message.includes('Cloudinary')) {
-        console.log('⚠️ Cloudinary upload failed, continuing without file...');
-        req.uploadError = err.message;
-        return next();
-      }
-      
+      // Don't fall back to localhost - return error instead
       return res.status(400).json({
         success: false,
-        error: 'File upload failed: ' + err.message
+        error: 'Image upload failed: ' + err.message + '. Please try again or contact administrator.'
       });
     }
     
     if (req.file) {
-      console.log('✅ File uploaded successfully:');
+      console.log('✅ File uploaded successfully to Cloudinary:');
       console.log('   Original name:', req.file.originalname);
-      console.log('   File path:', req.file.path);
+      console.log('   Cloudinary URL:', req.file.path);
       console.log('   Secure URL:', req.file.secure_url);
+      
+      // Verify that we got a Cloudinary URL
+      if (!req.file.path || !req.file.path.includes('cloudinary.com')) {
+        console.log('❌ Upload succeeded but did not get Cloudinary URL');
+        return res.status(500).json({
+          success: false,
+          error: 'Image upload failed - invalid storage service. Please try again.'
+        });
+      }
     } else {
       console.log('⚠️ No file in request');
     }

@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../middleware/upload');
 const { upload: cloudinaryUpload } = require('../middleware/cloudinary-upload');
 const { verifyAdminToken, adminRateLimiter } = require('../middleware/adminAuth');
 const { cleanupDummyData } = require('../controllers/cleanupController');
