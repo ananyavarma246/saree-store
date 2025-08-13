@@ -14,7 +14,11 @@ exports.debugEnvironment = async (req, res) => {
             hasAdminEmail: !!process.env.ADMIN_EMAIL,
             hasAdminPasswordHash: !!process.env.ADMIN_PASSWORD_HASH,
             hasAdminJwtSecret: !!process.env.ADMIN_JWT_SECRET,
+            hasCloudinaryCloudName: !!process.env.CLOUDINARY_CLOUD_NAME,
+            hasCloudinaryApiKey: !!process.env.CLOUDINARY_API_KEY,
+            hasCloudinaryApiSecret: !!process.env.CLOUDINARY_API_SECRET,
             adminEmailValue: process.env.ADMIN_EMAIL || 'NOT_SET',
+            cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || 'NOT_SET',
             nodeEnv: process.env.NODE_ENV || 'NOT_SET',
             timestamp: new Date().toISOString()
         };
@@ -951,21 +955,43 @@ exports.getAllProducts = async (req, res) => {
 // Add New Product
 exports.addProduct = async (req, res) => {
     try {
+        console.log('🔄 Adding new product...');
+        console.log('Request body fields:', Object.keys(req.body));
+        console.log('File upload info:', req.file ? {
+            filename: req.file.filename,
+            path: req.file.path,
+            secure_url: req.file.secure_url
+        } : 'No file uploaded');
+        
         let productData = { ...req.body };
         
-        // If image file was uploaded, use Cloudinary URL or fallback to local
+        // Handle image upload - prioritize Cloudinary, fallback to Railway storage
         if (req.file) {
-            // Cloudinary provides the secure URL directly
-            productData.image = req.file.path || req.file.secure_url || (() => {
-                // Fallback for local upload
-                const baseUrl = process.env.NODE_ENV === 'production' 
-                    ? 'https://alankree-production.up.railway.app'
-                    : 'http://localhost:5001';
-                return `${baseUrl}/uploads/${req.file.filename}`;
-            })();
+            if (req.file.path && req.file.path.includes('cloudinary.com')) {
+                // Cloudinary upload successful
+                productData.image = req.file.path;
+                console.log('✅ Using Cloudinary URL:', req.file.path);
+            } else if (req.file.secure_url) {
+                // Alternative Cloudinary URL format
+                productData.image = req.file.secure_url;
+                console.log('✅ Using Cloudinary secure URL:', req.file.secure_url);
+            } else if (req.file.filename) {
+                // Fallback to Railway storage
+                const baseUrl = 'https://alankree-production.up.railway.app';
+                productData.image = `${baseUrl}/uploads/${req.file.filename}`;
+                console.log('⚠️ Using Railway storage (ephemeral):', productData.image);
+            }
         }
         
+        // Ensure numeric fields are properly converted
+        if (productData.price) productData.price = parseFloat(productData.price);
+        if (productData.originalPrice) productData.originalPrice = parseFloat(productData.originalPrice);
+        
+        console.log('Final product data:', productData);
+        
         const product = await Product.create(productData);
+        
+        console.log('✅ Product created successfully with ID:', product._id);
         
         res.status(201).json({
             success: true,
@@ -973,6 +999,7 @@ exports.addProduct = async (req, res) => {
             product
         });
     } catch (error) {
+        console.error('❌ Error adding product:', error);
         res.status(400).json({
             success: false,
             error: error.message
@@ -984,19 +1011,31 @@ exports.addProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
     try {
         const { productId } = req.params;
+        console.log('🔄 Updating product:', productId);
+        
         let updateData = { ...req.body };
         
-        // If image file was uploaded, use Cloudinary URL or fallback to local
+        // Handle image upload - prioritize Cloudinary, fallback to Railway storage
         if (req.file) {
-            // Cloudinary provides the secure URL directly
-            updateData.image = req.file.path || req.file.secure_url || (() => {
-                // Fallback for local upload
-                const baseUrl = process.env.NODE_ENV === 'production' 
-                    ? 'https://alankree-production.up.railway.app'
-                    : 'http://localhost:5001';
-                return `${baseUrl}/uploads/${req.file.filename}`;
-            })();
+            if (req.file.path && req.file.path.includes('cloudinary.com')) {
+                // Cloudinary upload successful
+                updateData.image = req.file.path;
+                console.log('✅ Using Cloudinary URL:', req.file.path);
+            } else if (req.file.secure_url) {
+                // Alternative Cloudinary URL format
+                updateData.image = req.file.secure_url;
+                console.log('✅ Using Cloudinary secure URL:', req.file.secure_url);
+            } else if (req.file.filename) {
+                // Fallback to Railway storage
+                const baseUrl = 'https://alankree-production.up.railway.app';
+                updateData.image = `${baseUrl}/uploads/${req.file.filename}`;
+                console.log('⚠️ Using Railway storage (ephemeral):', updateData.image);
+            }
         }
+        
+        // Ensure numeric fields are properly converted
+        if (updateData.price) updateData.price = parseFloat(updateData.price);
+        if (updateData.originalPrice) updateData.originalPrice = parseFloat(updateData.originalPrice);
         
         const product = await Product.findByIdAndUpdate(
             productId,
@@ -1011,12 +1050,15 @@ exports.updateProduct = async (req, res) => {
             });
         }
         
+        console.log('✅ Product updated successfully');
+        
         res.status(200).json({
             success: true,
             message: 'Product updated successfully',
             product
         });
     } catch (error) {
+        console.error('❌ Error updating product:', error);
         res.status(400).json({
             success: false,
             error: error.message
